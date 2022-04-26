@@ -40,7 +40,7 @@ fun ReaderSplashScreen(navController: NavHostController) {
             )
         )
         delay(1000L)
-
+        navController.popBackStack()
         navController.navigate(route = ReaderScreens.ReaderLoginScreen.name)
     }
 

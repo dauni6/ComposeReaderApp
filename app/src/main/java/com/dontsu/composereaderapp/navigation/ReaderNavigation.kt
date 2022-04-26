@@ -1,6 +1,7 @@
 package com.dontsu.composereaderapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -12,6 +13,7 @@ import com.dontsu.composereaderapp.screens.splash.ReaderSplashScreen
 import com.dontsu.composereaderapp.screens.stats.ReaderStatsScreen
 import com.dontsu.composereaderapp.screens.update.ReaderUpdateScreen
 
+@ExperimentalComposeUiApi
 @Composable
 fun ReaderNavigation() {
 
