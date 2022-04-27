@@ -1,5 +1,6 @@
 package com.dontsu.composereaderapp.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,11 +29,16 @@ import com.dontsu.composereaderapp.R
 import com.dontsu.composereaderapp.components.EmailInput
 import com.dontsu.composereaderapp.components.PasswordInput
 import com.dontsu.composereaderapp.components.ReaderLogoText
+import com.dontsu.composereaderapp.navigation.ReaderScreens
 
 @ExperimentalComposeUiApi
 @Composable
-fun ReaderLoginScreen(navController: NavHostController) {
+fun ReaderLoginScreen(
+    navController: NavHostController,
+    viewModel: ReaderLoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier
@@ -44,7 +51,14 @@ fun ReaderLoginScreen(navController: NavHostController) {
             ReaderLogoText()
             if (showLoginForm.value) {
                 UserForm() { email, password ->
-                    // todo : Firebase login
+                    viewModel.signInWithEmailAndPassword(email = email, password = password) { isSuccess ->
+                        if (isSuccess) {
+                            navController.popBackStack()
+                            navController.navigate(route = ReaderScreens.ReaderHomeScreen.name)
+                        } else {
+                            Toast.makeText(context, "이메일 또는 비밀번호가 맞지 않습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             } else {
                 UserForm(isCreateAccount = true) { email, password ->
