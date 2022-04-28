@@ -62,7 +62,14 @@ fun ReaderLoginScreen(
                 }
             } else {
                 UserForm(isCreateAccount = true) { email, password ->
-                    // todo : create Firebase account
+                    viewModel.createUserWithEmailAndPassword(email, password) { isSuccess ->
+                        if (isSuccess) {
+                            navController.popBackStack()
+                            navController.navigate(route = ReaderScreens.ReaderHomeScreen.name)
+                        } else {
+                            Toast.makeText(context, "계정을 생성할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }

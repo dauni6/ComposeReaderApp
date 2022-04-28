@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.dontsu.composereaderapp.components.ReaderLogoText
 import com.dontsu.composereaderapp.navigation.ReaderScreens
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
@@ -39,8 +40,17 @@ fun ReaderSplashScreen(navController: NavHostController) {
                 }
             )
         )
+
         delay(1000L)
-        navController.popBackStack()
+
+//        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
+//            navController.popBackStack()
+//            navController.navigate(route = ReaderScreens.ReaderLoginScreen.name)
+//        } else {
+//            // 이미 로그인된 상태라면 바로 홈으로 보내기
+//            navController.popBackStack()
+//            navController.navigate(route = ReaderScreens.ReaderHomeScreen.name)
+//        }
         navController.navigate(route = ReaderScreens.ReaderLoginScreen.name)
     }
 
