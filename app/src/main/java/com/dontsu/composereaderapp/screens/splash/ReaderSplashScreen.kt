@@ -43,15 +43,14 @@ fun ReaderSplashScreen(navController: NavHostController) {
 
         delay(1000L)
 
-//        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
-//            navController.popBackStack()
-//            navController.navigate(route = ReaderScreens.ReaderLoginScreen.name)
-//        } else {
-//            // 이미 로그인된 상태라면 바로 홈으로 보내기
-//            navController.popBackStack()
-//            navController.navigate(route = ReaderScreens.ReaderHomeScreen.name)
-//        }
-        navController.navigate(route = ReaderScreens.ReaderLoginScreen.name)
+        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
+            navController.popBackStack()
+            navController.navigate(route = ReaderScreens.ReaderLoginScreen.name)
+        } else {
+            // 이미 로그인된 상태라면 바로 홈으로 보내기
+            navController.popBackStack()
+            navController.navigate(route = ReaderScreens.ReaderHomeScreen.name)
+        }
     }
 
     Surface(

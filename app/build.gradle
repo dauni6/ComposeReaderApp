@@ -62,6 +62,8 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 
+    implementation "androidx.compose.material:material-icons-extended:$compose_version" // 너무 많은 아이콘들을 갖게 되기 때문에 빌드시간이 길어질 수 있다.
+
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:29.3.1')
     implementation 'com.google.firebase:firebase-analytics-ktx'
