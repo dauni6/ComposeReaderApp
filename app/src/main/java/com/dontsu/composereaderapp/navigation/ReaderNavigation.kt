@@ -9,6 +9,7 @@ import com.dontsu.composereaderapp.screens.create_acount.ReaderCreateAccountScre
 import com.dontsu.composereaderapp.screens.detail.ReaderBookDetailScreen
 import com.dontsu.composereaderapp.screens.home.ReaderHomeScreen
 import com.dontsu.composereaderapp.screens.login.ReaderLoginScreen
+import com.dontsu.composereaderapp.screens.search.ReaderSearchScreen
 import com.dontsu.composereaderapp.screens.splash.ReaderSplashScreen
 import com.dontsu.composereaderapp.screens.stats.ReaderStatsScreen
 import com.dontsu.composereaderapp.screens.update.ReaderUpdateScreen
@@ -40,7 +41,7 @@ fun ReaderNavigation() {
         }
 
         composable(route = ReaderScreens.ReaderBookSearchScreen.name) {
-            ReaderBookDetailScreen(navController = navController)
+            ReaderSearchScreen(navController = navController)
         }
 
         composable(route = ReaderScreens.ReaderBookDetailScreen.name) {

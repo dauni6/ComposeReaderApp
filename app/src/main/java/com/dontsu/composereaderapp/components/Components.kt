@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.dontsu.composereaderapp.data.model.MBook
@@ -132,8 +134,10 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
 @Composable
 fun ReaderAppBar(
     title: String,
+    icon: ImageVector? = null,
     showProfile: Boolean = true,
-    navController: NavHostController
+    navController: NavController,
+    onBackClicked: () -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -146,15 +150,24 @@ fun ReaderAppBar(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Logo Icon"
                     )
-
-                    Text(
-                        text = title,
-                        color = Color.Red.copy(alpha = 0.7f),
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    )
-
-                    Spacer(modifier = Modifier.width(150.dp))
                 }
+
+                if (icon != null) {
+                    Icon(
+                        modifier = Modifier.clickable { onBackClicked() },
+                        imageVector = icon,
+                        contentDescription = "Back button",
+                        tint = Color.Black.copy(alpha = 0.9f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(40.dp))
+
+                Text(
+                    text = title,
+                    color = Color.Black.copy(alpha = 0.9f),
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                )
             }
         },
         actions = {
@@ -163,11 +176,16 @@ fun ReaderAppBar(
                     navController.navigate(route = ReaderScreens.ReaderLoginScreen.name)
                 }
             }) {
-                Icon(
-                    imageVector = Icons.Filled.Logout,
-                    contentDescription = "Sign out",
-                    tint = Color.Black.copy(alpha = 0.9f)
-                )
+                if (showProfile) {
+                    Row { // 여따가 Row를 쓰는 이유가 뭘까??
+                        Icon(
+                            imageVector = Icons.Filled.Logout,
+                            contentDescription = "Sign out",
+                            tint = Color.Black.copy(alpha = 0.9f)
+                        )
+                    }
+                }
+
             }
         },
         backgroundColor = Color.Transparent,

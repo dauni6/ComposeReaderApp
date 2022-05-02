@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.dontsu.composereaderapp.components.*
 import com.dontsu.composereaderapp.data.model.MBook
@@ -23,7 +24,7 @@ import com.dontsu.composereaderapp.navigation.ReaderScreens
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ReaderHomeScreen(navController: NavHostController) {
+fun ReaderHomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             ReaderAppBar(
@@ -34,7 +35,7 @@ fun ReaderHomeScreen(navController: NavHostController) {
         },
         floatingActionButton = {
             FABContent {
-
+                navController.navigate(route = ReaderScreens.ReaderBookSearchScreen.name)
             }
         }
     ) {
@@ -49,7 +50,7 @@ fun ReaderHomeScreen(navController: NavHostController) {
 
 
 @Composable
-fun HoneContent(navController: NavHostController) {
+fun HoneContent(navController: NavController) {
     val listOfBooks = listOf(
         MBook(
             id = "dads",
@@ -131,7 +132,7 @@ fun HoneContent(navController: NavHostController) {
 @Composable
 fun ReadingRightNowArea(
     books: List<MBook>,
-    navController: NavHostController
+    navController: NavController
 ) {
     ListCard()
 }
@@ -139,7 +140,7 @@ fun ReadingRightNowArea(
 @Composable
 fun BookListArea(
     listOfBooks: List<MBook>,
-    navController: NavHostController
+    navController: NavController
 ) {
     HorizontalScrollableComponent(listOfBooks) { title ->
         // todo : 클릭하면 디테일 스크린으로 가기
