@@ -1,22 +1,19 @@
 package com.dontsu.composereaderapp.screens.search
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -29,16 +26,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.dontsu.composereaderapp.components.InputField
 import com.dontsu.composereaderapp.components.ReaderAppBar
-import com.dontsu.composereaderapp.data.model.MBook
+import com.dontsu.composereaderapp.data.model.Item
 import com.dontsu.composereaderapp.navigation.ReaderScreens
 
 @ExperimentalComposeUiApi
 @Composable
-fun ReaderSearchScreen(navController: NavController) {
+fun ReaderSearchScreen(
+    navController: NavController,
+    viewModel: ReaderBookSearchViewModel = hiltViewModel()
+) {
     Scaffold(
         topBar = {
             ReaderAppBar(
@@ -57,8 +58,9 @@ fun ReaderSearchScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                ) { query ->
-                    Log.d("TEST", query)
+                ) { searchQuery ->
+                    viewModel.isLoading = true
+                    viewModel.searchBooks(query = searchQuery)
                 }
 
                 Spacer(modifier = Modifier.height(13.dp))
@@ -72,44 +74,29 @@ fun ReaderSearchScreen(navController: NavController) {
 }
 
 @Composable
-fun BookList(navController: NavController) {
-
-
-    val listOfBooks = listOf(
-        MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        )
-    )
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        items(listOfBooks) { mBook ->
-            BookRow(mBook = mBook, navController = navController)
+fun BookList(
+    navController: NavController,
+    viewModel: ReaderBookSearchViewModel = hiltViewModel()
+) {
+    val listOfBooks = viewModel.list.toMutableStateList()
+    if (viewModel.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            LinearProgressIndicator(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .align(Alignment.TopCenter)
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            items(listOfBooks) { item ->
+                BookRow(item = item, navController = navController)
+            }
         }
     }
 
@@ -142,11 +129,9 @@ fun SearchForm(
    }
 }
 
-
-
 @Composable
 fun BookRow(
-    mBook: MBook,
+    item: Item,
     navController: NavController
 ) {
     Card(
@@ -169,7 +154,7 @@ fun BookRow(
                     .width(100.dp)
                     .height(140.dp)
                     .padding(4.dp),
-                painter = rememberImagePainter(data = "http://books.google.com/books/content?id=ImnyDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"),
+                painter = rememberImagePainter(data = item.volumeInfo?.imageLinks?.smallThumbnail.toString()),
                 contentDescription = null
             )
 
@@ -178,7 +163,7 @@ fun BookRow(
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = mBook.title.toString(),
+                    text = item.volumeInfo?.title.toString(),
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         color = Color.Black,
@@ -188,7 +173,7 @@ fun BookRow(
                 )
 
                 Text(
-                    text = "Authors: ${mBook.authors.toString()}",
+                    text = "Authors: ${item.volumeInfo?.authors}",
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
                         color = Color.LightGray,
@@ -198,7 +183,7 @@ fun BookRow(
                 )
 
                 Text(
-                    text = "Date: 2022-11-09",
+                    text = "Date: ${item.volumeInfo?.publishedDate}",
                     style = TextStyle(
                         color = Color.LightGray,
                         fontSize = 16.sp,
@@ -207,7 +192,13 @@ fun BookRow(
                 )
 
                 Text(
-                    text = "[Computer]"
+                    text = item.volumeInfo?.categories.toString(),
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(
+                        color = Color.LightGray,
+                        fontSize = 16.sp,
+                        fontStyle = FontStyle.Italic
+                    )
                 )
             }
         }
