@@ -1,7 +1,7 @@
 package com.dontsu.composereaderapp.di
 
-import com.dontsu.composereaderapp.data.repository.BookRepository2
-import com.dontsu.composereaderapp.data.repository.BookRepositoryImpl2
+import com.dontsu.composereaderapp.data.repository.BookRepository
+import com.dontsu.composereaderapp.data.repository.BookRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ abstract class ReaderRemoteRepositoryModule {
 
     @Binds
     abstract fun provideReaderBookRemoteRepository(
-        bookRepositoryImpl2: BookRepositoryImpl2
-    ): BookRepository2
+        bookRepositoryImpl2: BookRepositoryImpl
+    ): BookRepository
 
 }

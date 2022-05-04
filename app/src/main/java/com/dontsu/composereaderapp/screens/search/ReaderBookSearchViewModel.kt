@@ -8,14 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dontsu.composereaderapp.data.Resource
 import com.dontsu.composereaderapp.data.model.Item
-import com.dontsu.composereaderapp.data.repository.BookRepository2
+import com.dontsu.composereaderapp.data.repository.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ReaderBookSearchViewModel @Inject constructor(
-    private val repository: BookRepository2
+    private val repository: BookRepository
 ): ViewModel() {
     var list: List<Item> by mutableStateOf(listOf())
     var isLoading: Boolean by mutableStateOf(true)

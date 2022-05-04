@@ -140,7 +140,7 @@ fun BookRow(
             .wrapContentHeight()
             .padding(3.dp)
             .clickable {
-                // do something
+                navController.navigate(ReaderScreens.ReaderBookDetailScreen.name + "/${item.id}")
             },
         shape = RectangleShape,
         elevation = 7.dp

@@ -2,9 +2,11 @@ package com.dontsu.composereaderapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.dontsu.composereaderapp.screens.create_acount.ReaderCreateAccountScreen
 import com.dontsu.composereaderapp.screens.detail.ReaderBookDetailScreen
 import com.dontsu.composereaderapp.screens.home.ReaderHomeScreen
@@ -44,8 +46,19 @@ fun ReaderNavigation() {
             ReaderSearchScreen(navController = navController)
         }
 
-        composable(route = ReaderScreens.ReaderBookDetailScreen.name) {
-            ReaderBookDetailScreen(navController = navController)
+        val detailName = ReaderScreens.ReaderBookDetailScreen.name
+        composable(
+            route = "$detailName/{bookId}",
+            arguments = listOf(navArgument(
+                "bookId"
+            ) {
+                type = NavType.StringType
+              }
+            )
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("bookId")?.let {
+                ReaderBookDetailScreen(navController = navController, bookId = it)
+            }
         }
 
         composable(route = ReaderScreens.ReaderUpdateScreen.name) {
