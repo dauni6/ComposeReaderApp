@@ -1,5 +1,6 @@
 package com.dontsu.composereaderapp.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -16,15 +17,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.dontsu.composereaderapp.components.*
 import com.dontsu.composereaderapp.data.model.MBook
 import com.dontsu.composereaderapp.navigation.ReaderScreens
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ReaderHomeScreen(navController: NavController) {
+fun ReaderHomeScreen(
+    navController: NavController,
+    viewModel: ReaderHomeScreenViewModel = hiltViewModel()
+) {
     Scaffold(
         topBar = {
             ReaderAppBar(
@@ -42,7 +46,7 @@ fun ReaderHomeScreen(navController: NavController) {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            HoneContent(navController = navController)
+            HoneContent(navController = navController, viewModel = viewModel)
         }
     }
 
@@ -50,35 +54,19 @@ fun ReaderHomeScreen(navController: NavController) {
 
 
 @Composable
-fun HoneContent(navController: NavController) {
-    val listOfBooks = listOf(
-        MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        ),MBook(
-            id = "dads",
-            title = "Hello Again",
-            authors = "All of us",
-            notes = null
-        )
-    )
+fun HoneContent(
+    navController: NavController,
+    viewModel: ReaderHomeScreenViewModel
+) {
+    var listOfBooks = emptyList<MBook>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    if (!viewModel.data.value.data.isNullOrEmpty()) {
+        listOfBooks = viewModel.data.value.data!!.toList().filter { mBook ->
+            mBook.userId == currentUser?.uid.toString()
+        }
+    }
+
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUserName = if (!email.isNullOrEmpty()) email.substringBefore("@") else "No name"
 
@@ -121,7 +109,7 @@ fun HoneContent(navController: NavController) {
                 )
             }
         }
-        ReadingRightNowArea(books = listOf(), navController = navController)
+        ReadingRightNowArea(listOfBooks = listOfBooks, navController = navController)
 
         TitleSection(label = "Reading List")
 
@@ -131,10 +119,23 @@ fun HoneContent(navController: NavController) {
 
 @Composable
 fun ReadingRightNowArea(
-    books: List<MBook>,
+    listOfBooks: List<MBook>,
     navController: NavController
 ) {
-    ListCard()
+    val scrollState = rememberScrollState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(280.dp)
+            .horizontalScroll(scrollState)
+    ) {
+        listOfBooks.forEach { book ->
+            ListCard(mBook = book) { title ->
+
+            }
+        }
+    }
 }
 
 @Composable
@@ -142,8 +143,8 @@ fun BookListArea(
     listOfBooks: List<MBook>,
     navController: NavController
 ) {
-    HorizontalScrollableComponent(listOfBooks) { title ->
-        // todo : 클릭하면 디테일 스크린으로 가기
+    HorizontalScrollableComponent(listOfBooks) { googleBookId ->
+       navController.navigate(route = ReaderScreens.ReaderUpdateScreen.name + "/${googleBookId}")
     }
 }
 
@@ -161,8 +162,8 @@ fun HorizontalScrollableComponent(
             .horizontalScroll(scrollState)
     ) {
         listOfBooks.forEach { book ->
-            ListCard(book = book) { title ->
-                onCardPressed(title)
+            ListCard(mBook = book) {
+                onCardPressed(book.googleBookId.toString())
             }
         }
     }

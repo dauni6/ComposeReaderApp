@@ -6,9 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dontsu.composereaderapp.data.Resource
+import com.dontsu.composereaderapp.data.wrapper.Resource
 import com.dontsu.composereaderapp.data.model.Item
-import com.dontsu.composereaderapp.data.repository.BookRepository
+import com.dontsu.composereaderapp.data.repository.book.BookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

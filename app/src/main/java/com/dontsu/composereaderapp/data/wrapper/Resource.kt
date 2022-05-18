@@ -1,4 +1,4 @@
-package com.dontsu.composereaderapp.data
+package com.dontsu.composereaderapp.data.wrapper
 
 sealed class Resource<T>(
     val data: T? = null,

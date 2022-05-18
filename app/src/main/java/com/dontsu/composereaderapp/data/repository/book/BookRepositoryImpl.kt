@@ -1,6 +1,6 @@
-package com.dontsu.composereaderapp.data.repository
+package com.dontsu.composereaderapp.data.repository.book
 
-import com.dontsu.composereaderapp.data.Resource
+import com.dontsu.composereaderapp.data.wrapper.Resource
 import com.dontsu.composereaderapp.data.model.Item
 import com.dontsu.composereaderapp.data.network.BooksApi
 import com.dontsu.composereaderapp.di.IODispatcher

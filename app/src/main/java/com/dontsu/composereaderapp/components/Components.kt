@@ -1,5 +1,10 @@
 package com.dontsu.composereaderapp.components
 
+import android.view.MotionEvent
+import android.widget.RatingBar
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,15 +13,17 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,8 +37,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.dontsu.composereaderapp.R
 import com.dontsu.composereaderapp.data.model.MBook
 import com.dontsu.composereaderapp.navigation.ReaderScreens
 import com.google.firebase.auth.FirebaseAuth
@@ -103,7 +110,8 @@ fun PasswordInput(
     imeAction: ImeAction = ImeAction.Done,
     keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
-    val visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation()
+    val visualTransformation =
+        if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation()
 
     OutlinedTextField(
         modifier = modifier
@@ -115,7 +123,10 @@ fun PasswordInput(
         singleLine = true,
         textStyle = TextStyle(fontSize = 18.sp, color = MaterialTheme.colors.onBackground),
         enabled = enabled,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = imeAction
+        ),
         keyboardActions = keyboardActions,
         visualTransformation = visualTransformation,
         trailingIcon = { PasswordVisibility(passwordVisibility = passwordVisibility) }
@@ -256,11 +267,10 @@ fun BookRating(score: Double = 4.5) {
 
 }
 
-@Preview
 @Composable
 fun ListCard(
-    book: MBook = MBook("abcd", "Running", "Me and you", "Hello world!"),
-    onPressDetails: (String) -> Unit = {}
+    mBook: MBook,
+    onPressDetails: (MBook) -> Unit = {}
 ) {
     val context = LocalContext.current
     val resources = context.resources
@@ -275,7 +285,7 @@ fun ListCard(
             .width(202.dp)
             .height(242.dp)
             .clickable {
-                onPressDetails(book.title.toString())
+                onPressDetails(mBook)
             },
         shape = RoundedCornerShape(29.dp),
         backgroundColor = Color.White,
@@ -291,7 +301,7 @@ fun ListCard(
                         .width(100.dp)
                         .height(140.dp)
                         .padding(4.dp),
-                    painter = rememberImagePainter(data = "http://books.google.com/books/content?id=ImnyDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"),
+                    painter = rememberImagePainter(data = mBook.photoUrl),
                     contentDescription = "Book image"
                 )
 
@@ -313,7 +323,7 @@ fun ListCard(
 
             Text(
                 modifier = Modifier.padding(4.dp),
-                text = book.title.toString(),
+                text = mBook.title.toString(),
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis // 글자가 넘 길면 ... 로 보이게 하기
@@ -321,7 +331,7 @@ fun ListCard(
 
             Text(
                 modifier = Modifier.padding(4.dp),
-                text = book.authors.toString(),
+                text = mBook.authors.toString(),
                 style = MaterialTheme.typography.caption
             )
         }
@@ -341,10 +351,15 @@ fun ListCard(
 fun RoundedButton(
     label: String = "Reading",
     radius: Int = 29,
-    onPressed: () -> Unit= {}
+    onPressed: () -> Unit = {}
 ) {
     Surface(
-        modifier = Modifier.clip(RoundedCornerShape(bottomEndPercent = radius, topStartPercent = radius)),
+        modifier = Modifier.clip(
+            RoundedCornerShape(
+                bottomEndPercent = radius,
+                topStartPercent = radius
+            )
+        ),
         color = Color(0xFF92CBDF)
     ) {
         Column(
@@ -357,11 +372,59 @@ fun RoundedButton(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = label, style = TextStyle(
-                color = Color.White,
-                fontSize = 15.sp
-            )
+            Text(
+                text = label, style = TextStyle(
+                    color = Color.White,
+                    fontSize = 15.sp
+                )
             )
         }
     }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+fun RatingBar(
+    modifier: Modifier = Modifier,
+    rating: Int,
+    onPressRating: (Int) -> Unit
+) {
+    var ratingState by remember { mutableStateOf(rating) }
+    var selected by remember { mutableStateOf(false) }
+    val size by animateDpAsState(
+        targetValue = if (selected) 42.dp else 34.dp,
+        spring(Spring.DampingRatioNoBouncy)
+    )
+
+    Row(
+        modifier = Modifier.width(280.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        repeat(5) { index ->
+            Icon(
+                modifier = Modifier
+                    .width(size)
+                    .height(size)
+                    .pointerInteropFilter {
+                        // pointerInteropFilter 는 뭘까?
+                        when (it.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                selected = true
+                                onPressRating(index)
+                                ratingState = index
+                            }
+                            MotionEvent.ACTION_UP -> {
+                                selected = false
+                            }
+                        }
+                        true
+                    },
+                painter = painterResource(id = R.drawable.ic_baseline_star_border_24),
+                contentDescription = "star",
+                tint = if (index <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+            )
+        }
+    }
+
 }

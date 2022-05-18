@@ -1,6 +1,7 @@
 package com.dontsu.composereaderapp.data.model
 
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.annotations.SerializedName
 
 data class VolumeInfo(
@@ -44,4 +45,20 @@ data class VolumeInfo(
     val subtitle: String?,
     @SerializedName("title")
     val title: String?
-)
+) {
+    fun toMBook(googleBookId: String?): MBook {
+        return MBook(
+            userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),
+            title = this.title,
+            authors = this.authors.toString(),
+            description = this.description,
+            categories = categories.toString(),
+            notes = "",
+            photoUrl = this.imageLinks?.thumbnail.toString(),
+            publishedDate = this.publishedDate,
+            pageCount = this.pageCount.toString(),
+            rating = 0.0,
+            googleBookId = googleBookId
+        )
+    }
+}
